@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" href="../favicon.ico">
+    <script type="text/javascript" src="../../../plugin/tp/jquery.js"></script>
+    <script type="text/javascript" src="../../../plugin/tp/jtopo-0.4.8-min.js"></script>
+    <title></title>
+</head>
+<body>
+<div id="content"></div>
+<canvas id="canvas" width="500" height="500"></canvas>
+</body>
+<script>
+    function getQueryVariable(variable)
+    {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable){return pair[1];}
+        }
+        return(false);
+    }
+    var id=getQueryVariable("id");
+    console.log(getQueryVariable("id"));
+    CanvasRenderingContext2D.prototype.wrapText = function(str,x,y){
+        var textArray = str.split('\n');
+        if(textArray==undefined||textArray==null)return false;
+
+        var rowCnt = textArray.length;
+        var i = 0,imax  = rowCnt,maxLength = 0;maxText = textArray[0];
+        for(;i<imax;i++){
+            var nowText = textArray[i],textLength = nowText.length;
+            if(textLength >=maxLength){
+                maxLength = textLength;
+                maxText = nowText;
+            }
+        }
+        var maxWidth = this.measureText(maxText).width;
+        var lineHeight = this.measureText("元").width;
+        for(var j= 0;j<textArray.length;j++){
+            var words = textArray[j];
+            this.fillText(words,-(maxWidth/2),y-textArray.length*lineHeight/2);
+            this.font="9px Verdana";//设置字体大小
+
+            y+= lineHeight;
+        }
+    };
+
+    JTopo.Node.prototype.paintText = function(a){
+        var b = this.text;
+        if (null != b && "" != b) {
+            a.beginPath(),
+                a.font = this.font;
+            var c = a.measureText(b).width,
+                d = a.measureText("田").width;
+            a.fillStyle = "rgba(" + this.fontColor + ", " + this.alpha + ")";
+            var e = this.getTextPostion(this.textPosition, c, d);
+            a.wrapText(b, e.x, e.y),
+                a.closePath()
+        }
+    }
+
+
+    function nodeExist(node){
+        var res=true;
+        if (typeof(node) == undefined) {
+            return false;
+        }
+        if (node == undefined) {
+           return false;
+        }
+        return res;
+    }
+    function setText(value){
+        var res="";
+        if (typeof(value) == undefined) {
+            return "";
+        }
+        if (value == undefined) {
+            return "";
+        }
+        return value;
+    }
+    // 简单连线
+    function newLink(nodeA, nodeZ, text,color){
+        var link = new JTopo.Link(nodeA, nodeZ, text);
+        link.lineWidth = 1; // 线宽
+        link.shadow = false;
+        link.showSelected=false;
+        return link;
+    }
+    //
+    // var data={
+    //     name:"信息系统",
+    //     hosts:[
+    //         {id:"1",
+    //             loc:"物理机",
+    //             name:"host1",
+    //             ip:"192.168.1.1",
+    //             db:{id:"1",name:"oracle",instances:[{id:"1",name:"db1"},{id:"1",name:"db1"},{id:"1",name:"db1"}]},
+    //             storage:[{id:"1",name:"v7000"}]
+    //         },
+    //         {id:"2",name:"host2",ip:"192.168.1.2",
+    //             mid:[{id:"1",type:"12",name:"was"}],
+    //             storage:[{id:"1",name:"v7000"}]
+    //         }, {id:"1",name:"host1",ip:"192.168.1.1",
+    //             db:{id:"1",name:"oracle",instances:[{id:"1",name:"db1"},{id:"1",name:"db1"},{id:"1",name:"db1"}]},
+    //             storage:[{id:"1",name:"v7000"}]
+    //         },
+    //         {id:"2",name:"host2",ip:"192.168.1.2",
+    //             mid:[{id:"1",type:"12",name:"was"}],
+    //             storage:[{id:"1",name:"v7000"}]
+    //         },
+    //         {id:"2",name:"host2",ip:"192.168.1.2",
+    //             mid:[{id:"1",type:"12",name:"was"}],
+    //             storage:[{id:"1",name:"v7000"}]
+    //         },
+    //         {id:"2",name:"host2",ip:"192.168.1.2",
+    //             mid:{id:"1",name:"中间件",list:[{id:"1",type:"12",name:"was"}]},
+    //             storage:[{id:"1",name:"v7000"}]
+    //         }, {id:"1",name:"host1",ip:"192.168.1.1",
+    //             db:{id:"1",name:"oracle",instances:[{id:"1",name:"db1"},{id:"1",name:"db1"},{id:"1",name:"db1"}]},
+    //             storage:[{id:"1",name:"v7000"}]
+    //         }
+    //
+    //
+    //     ]
+    // };
+    function createtp(data){
+        var ltype="tree";
+        var direct="bottom";
+        //var ltype="circle";
+        var h = screen.height - 40;
+        var w = screen.width - 20;
+        // var h = screen.height - 400;
+        // var w = screen.width - 200;
+        var canvas = document.getElementById('canvas');
+        canvas.setAttribute('width', w);
+        canvas.setAttribute('height', h);
+        var stage = new JTopo.Stage(canvas); // 创建一个舞台对象
+        showJTopoToobar(stage);
+        stage.eagleEye.visible = true;
+        var scene = new JTopo.Scene(stage); // 创建一个场景对象
+        scene.background = '../../../plugin/tp/bg2.jpg';
+        scene.backgroundColor="blue"
+        //添加信息系统
+        var node_system= new JTopo.Node();    // 创建一个节点
+        node_system.text="\n\n"+data.name;
+        node_system.layout = {direction:direct,type: ltype, width:180, height: 150}
+        node_system.setLocation(560,80);
+        node_system.fontColor= "255,255,0";
+        node_system.showSelected=false;
+        node_system.setSize(50,50);
+        node_system.setImage('../../../plugin/tp/system.png'); // 设置图片
+        scene.add(node_system); // 放入到场景中
+        //添加主机
+        var hosts=data.hosts;
+        for(var i=0;i<hosts.length;i++){
+            var host=hosts[i];
+            var node_host = new JTopo.Node();    // 创建一个节点
+            node_host.text="\n\n名称:"+host.name+"\nip:"+host.ip+"\nOS:"+host.sysosdtlstr+ "\n位置:"+host.syslocstr;
+            node_host.fontColor= "255,255,0";
+            node_host.showSelected=false;
+            node_host.setBound(10, 10,200,200);
+            node_host.setSize(60, 40);
+            node_host.setLocation(scene.width * Math.random(), scene.height * Math.random());
+            node_host.layout = {direction:direct,type: ltype, width:50, height: 100};
+            node_host.setImage('../../../plugin/tp/server.png')
+            scene.add(node_host);
+            var link = newLink(node_system,node_host,'','') ;
+            scene.add(link);
+            //添加数据库
+            if(nodeExist(host.db)&&nodeExist(host.sysdbdtlstr)){
+                var db=host.db;
+                var inst=""
+                if(nodeExist(host.dbinstance)){
+                    var instance=host.dbinstance;
+                    for(var ii=0;ii<instance.length;ii++){
+                        inst=inst+"实例:"+instance[ii].dbinstance+"\n";
+                    }
+                }
+                var node_db=new JTopo.Node();    // 创建一个节点
+                testdb=node_db;
+                node_db.text="\n\n数据库\n"+host.sysdbdtlstr+"\n"+inst;
+                node_db.setSize(30,30);
+                node_db.showSelected=false;
+                node_db.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                node_db.layout = {direction:direct,type: ltype, width:50, height: 80};
+                node_db.fontColor= "0,255,0";
+                node_db.setImage('../../../plugin/tp/db.png')
+                scene.add(node_db);
+                var link = newLink(node_host, node_db,'','') ;
+                scene.add(link);
+                // if(nodeExist(db.instances)){
+                //     var db_instances=db.instances;
+                //     for(var idb=0;idb<db_instances.length;idb++){
+                //         var node_db_instance=new JTopo.Node();    // 创建一个节点
+                //         node_db_instance.text="\n\n数据库实例";
+                //         node_db_instance.showSelected=false;
+                //         node_db_instance.fontColor= "0,255,0";
+                //         node_db_instance.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                //         node_db_instance.layout = {direction:direct,type: 'tree', width:20, height: 80};
+                //         node_db_instance.setSize(30,30)
+                //         node_db_instance.setImage('dbinstance.png')
+                //         node_db_instance.shadow = false;
+                //         scene.add(node_db_instance);
+                //         var link = newLink(node_db, node_db_instance,'','') ;
+                //         scene.add(link);
+                //
+                //     }
+                // }
+            }
+            //添加中间件
+            if(nodeExist(host.mid)){
+                var mid=host.mid;
+                for(var imid=0;imid<mid.length;imid++){
+                    var node_mid_list=new JTopo.Node();    // 创建一个节点
+                    var mid_info=mid[imid];
+                    node_mid_list.showSelected=false;
+                    node_mid_list.text="\n"+mid_info.name;
+                    node_mid_list.fontColor= "0,255,0";
+                    node_mid_list.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                    node_mid_list.layout = {direction:direct,type: ltype, width:50, height: 100};
+                    node_mid_list.setSize(30,30);
+                    node_mid_list.setImage('../../../plugin/tp/mid.png')
+                    scene.add(node_mid_list);
+                    var link = newLink(node_host, node_mid_list,'','') ;
+                    scene.add(link);
+                }
+            }
+            //主机存储
+            if(nodeExist(host.storage)){
+                var storage=host.storage;
+                var node_storage=new JTopo.Node();    // 创建一个节点
+                node_storage.text="\nV7000";
+                node_storage.showSelected=false;
+                node_storage.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                node_storage.layout = {direction:direct,type: ltype, width:50, height: 150};
+                node_storage.setSize(30,30);
+                node_storage.fontColor= "0,255,0";
+                node_storage.setImage('../../../plugin/tp/storage.png')
+                scene.add(node_storage);
+                var link = newLink(node_host, node_storage,'','') ;
+                scene.add(link);
+                for(var istorage=0;istorage<storage.length;istorage++){
+                    var node_storage_list=new JTopo.Node();    // 创建一个节点
+                    node_storage_list.text="\n存储节点";
+                    node_storage_list.showSelected=false;
+                    node_storage_list.fontColor= "0,255,0";
+                    node_storage_list.setLocation(scene.width * Math.random(), scene.height * Math.random());
+                    node_storage_list.layout = {direction:direct,type: ltype, width:50, height: 150};
+                    node_storage_list.setSize(30,30)
+                    node_storage_list.setImage('../../../plugin/tp/storagenode.png')
+                    scene.add(node_storage_list);
+                    var link = newLink(node_storage, node_storage_list,'','') ;
+                    scene.add(link);
+                }
+            }
+        }
+        stage.find('node').attr('shadow', false);
+        JTopo.layout.layoutNode(scene, node_system, true);
+    }
+    $.ajax({
+        url : "/dt/api/ops/opsNodeInfosys/ext/queryTpData.do",
+        type : "get",
+        async : true,//此处需要注意的是要想获取ajax返回的值这个async属性必须设置成同步的，否则获取不到返回值
+        data : {"id":id},
+        dataType : "json",
+        success : function(data) {
+            createtp(data.data);
+        }
+    });
+</script>
+</html>
+

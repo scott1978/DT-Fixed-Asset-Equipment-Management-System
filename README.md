@@ -1,8 +1,6 @@
 ## 版本说明
-- 将推出新版本
-- 新版版本Git地址
+- 对DT版本进行了重构，新版本地址如下:
 - https://gitee.com/lank/eam
-
 
 ## DT 版本
 - http://eam-demo.rainbooow.com:26799/dt/console

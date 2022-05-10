@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="dt:war">
+    <output-path>$PROJECT_DIR$/dtAsset/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>dt</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="${project.artifactId}-${project.version}.war">
+      <element id="artifact" artifact-name="dt:war exploded" />
+    </root>
+  </artifact>
+</component>

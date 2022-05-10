@@ -106,6 +106,7 @@ function prepend(arr, item) {
     a.unshift(item);
     return a;
 }
+
 function formatRackData(data,cap,rackuuid){
     var result={};
     var ctime=Date.now();

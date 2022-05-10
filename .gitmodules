@@ -1,0 +1,4 @@
+[submodule "eamSource/eamNew"]
+	url  = https://gitee.com/lank/eam
+	path = eamSource/eamNew
+

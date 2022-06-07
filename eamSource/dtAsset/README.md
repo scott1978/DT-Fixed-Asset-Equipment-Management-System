@@ -1,22 +1,20 @@
 ## 版本说明
-- 将推出新版本
 - 新版版本Git地址
 - https://gitee.com/lank/eam
 
+## 重构后的版本，演示地址
+- EAM 版本为DT的新版本，Git地址：https://gitee.com/lank/eam
+- http://eam-demo.rainbooow.com:26788/index.html
+- 账户:admin 密码:123456
 
-## DT 版本
-- http://eam-demo.rainbooow.com:26799/dt/console
+## 原DT版本，演示地址
+- http://dt-demo.rainbooow.com:26799/dt/console
 - 账户:guest 密码:oracle
 - 账户:user1 密码:oracle
 - 账户:user2 密码:oracle
 - 账户:user3 密码:oracle
 - admin oracle
 - 系统包含admin 管理用户
-
-## EAM 版本
-- EAM 版本为DT的新版本，Git地址：https://gitee.com/lank/eam
-- http://eam-demo.rainbooow.com:26788/index.html
-- 账户:admin 密码:123456
 
 ## 联系方式
 - Mail:maillank@qq.com

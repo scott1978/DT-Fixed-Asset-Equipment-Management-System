@@ -1,6 +1,6 @@
 #!bin/sh/
 #crontab
-#	2 2 * * * sh /opt/dt/reDeploy.sh
+#2 2 * * * sh /app/script/deploy_dt_demo.sh
 #############################################
 v=2.2.26
 
